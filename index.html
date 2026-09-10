@@ -50,39 +50,6 @@
     color:var(--ink-dim);
     margin:0 0 24px;
   }
-  .field{
-    text-align:left;
-    margin-bottom:14px;
-  }
-  label.field-label{
-    font-size:12px;
-    color:var(--ink-dim);
-    display:block;
-    margin-bottom:6px;
-  }
-  input[type="password"]{
-    width:100%;
-    background:var(--panel-2);
-    border:1px solid var(--line);
-    color:var(--ink);
-    padding:11px 12px;
-    border-radius:6px;
-    font-family:var(--mono);
-    font-size:13px;
-    outline:none;
-  }
-  input[type="password"]:focus{
-    border-color:var(--accent-dim);
-  }
-  .checkbox-row{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:12px;
-    color:var(--ink-dim);
-    margin-bottom:22px;
-    text-align:left;
-  }
   button{
     width:100%;
     background:var(--accent);
@@ -156,16 +123,6 @@
   <h1>Comparador FOB PY <span>· Top Neumáticos</span></h1>
   <p class="subtitle">Genera el comparador con los precios y datos más recientes.</p>
 
-  <div class="field">
-    <label class="field-label" for="authKey">Clave de acceso</label>
-    <input type="password" id="authKey" placeholder="Ingresá la clave" autocomplete="off">
-  </div>
-
-  <div class="checkbox-row">
-    <input type="checkbox" id="rememberKey">
-    <label for="rememberKey">Recordar clave en este navegador</label>
-  </div>
-
   <button id="generateBtn">
     <span class="spinner"></span>
     <span class="btn-label" id="btnLabel">Generar comparador</span>
@@ -180,21 +137,11 @@
 
 <script>
   const WEBHOOK_URL = "https://envy-recollect-last.ngrok-free.dev/webhook/FOB-PY";
-  const AUTH_HEADER_NAME = "X-Auth-Key";
-  const STORAGE_KEY = "fobpy_auth_key";
 
-  const authInput = document.getElementById("authKey");
-  const rememberCheckbox = document.getElementById("rememberKey");
   const generateBtn = document.getElementById("generateBtn");
   const btnLabel = document.getElementById("btnLabel");
   const timerEl = document.getElementById("timer");
   const errorBox = document.getElementById("errorBox");
-
-  const savedKey = localStorage.getItem(STORAGE_KEY);
-  if (savedKey) {
-    authInput.value = savedKey;
-    rememberCheckbox.checked = true;
-  }
 
   let timerInterval = null;
   let startTime = null;
@@ -220,20 +167,8 @@
   }
 
   async function generarComparador() {
-    const key = authInput.value.trim();
     errorBox.style.display = "none";
     document.getElementById("linkFallback").innerHTML = "";
-
-    if (!key) {
-      errorBox.style.display = "block";
-      return;
-    }
-
-    if (rememberCheckbox.checked) {
-      localStorage.setItem(STORAGE_KEY, key);
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-    }
 
     generateBtn.disabled = true;
     generateBtn.classList.add("loading");
@@ -244,7 +179,6 @@
       const response = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: {
-          [AUTH_HEADER_NAME]: key,
           "ngrok-skip-browser-warning": "true"
         }
       });
@@ -275,9 +209,6 @@
   }
 
   generateBtn.addEventListener("click", generarComparador);
-  authInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") generarComparador();
-  });
 </script>
 </body>
 </html>
